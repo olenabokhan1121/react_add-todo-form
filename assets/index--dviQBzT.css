@@ -1,0 +1,1 @@
+iframe{display:none}html{font-family:Arial,Helvetica Neue,Helvetica,sans-serif}label,button{cursor:pointer}.error{color:red}.TodoInfo{width:max-content;margin:12px 0;padding:8px;border:1px solid #000;border-radius:8px;background-color:#faebd7}.TodoInfo__title{margin:4px 0;font-size:inherit;color:red}.TodoInfo--completed .TodoInfo__title{color:#080}
