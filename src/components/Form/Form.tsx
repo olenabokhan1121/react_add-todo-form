@@ -12,9 +12,16 @@ interface FormData {
   title: string;
   user: User | null;
 }
+interface Touched {
+  title: boolean;
+  user: boolean;
+}
 export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
   const [count, setCount] = useState(0);
-  const [touched, setTouched] = useState(false);
+  const [touched, setTouched] = useState<Touched>({
+    title: false,
+    user: false,
+  });
   const [form, setForm] = useState<FormData>({
     title: '',
     user: null,
@@ -23,7 +30,7 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
 
   function handleFormSubmit(event: React.FormEvent) {
     event?.preventDefault();
-    setTouched(true);
+    setTouched({ title: true, user: true });
     if (!isError) {
       onAdd({
         id: lastId + 1,
@@ -37,16 +44,23 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
         user: null,
       });
       setCount(prev => prev + 1);
-      setTouched(false);
+      setTouched({
+        title: false,
+        user: false,
+      });
     }
   }
 
-  function handleFofmChange(name: string, value: string) {
+  function handleFormChange(name: string, value: string) {
     switch (name) {
       case 'title':
         setForm(prev => {
           return { ...prev, [name]: value };
         });
+        setTouched(prev => ({
+          ...prev,
+          title: false,
+        }));
 
         break;
       case 'user':
@@ -56,6 +70,12 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
             [name]: getUserById(+value),
           };
         });
+        setTouched(prev => ({
+          ...prev,
+          user: false,
+        }));
+
+        break;
     }
   }
 
@@ -67,26 +87,30 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
       key={count}
     >
       <div className="field">
+        <label htmlFor="title">Title:</label>
         <input
+          id="title"
           type="text"
           data-cy="titleInput"
           onChange={event =>
-            handleFofmChange(event.target.name, event.target.value)
+            handleFormChange(event.target.name, event.target.value)
           }
           value={form.title}
           name="title"
           placeholder="Enter a title"
         />
-        {!form.title.trim() && touched && (
+        {!form.title.trim() && touched.title && (
           <span className="error">Please enter a title</span>
         )}
       </div>
 
       <div className="field">
+        <label htmlFor="user">User:</label>
         <select
+          id="user"
           data-cy="userSelect"
           onChange={event =>
-            handleFofmChange(event.target.name, event.target.value)
+            handleFormChange(event.target.name, event.target.value)
           }
           name="user"
           value={form.user?.id || 0}
@@ -94,6 +118,7 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
           <option value="0" disabled>
             Choose a user
           </option>
+
           {usersFromServer.map(user => (
             <option key={user.id} value={user.id}>
               {user.name}
@@ -101,7 +126,7 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
           ))}
         </select>
 
-        {!form.user && touched && (
+        {!form.user && touched.user && (
           <span className="error">Please choose a user</span>
         )}
       </div>
