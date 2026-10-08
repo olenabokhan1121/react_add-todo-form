@@ -5,8 +5,7 @@ import { User } from '../../types.ts/User';
 import { getUserById } from '../../utils/getUserByID';
 
 interface Props {
-  onAdd: (newTodo: Todo) => void;
-  lastId: number;
+  onAdd: (newTodo: Omit<Todo, 'id'>) => void;
 }
 interface FormData {
   title: string;
@@ -16,7 +15,7 @@ interface Touched {
   title: boolean;
   user: boolean;
 }
-export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
+export const Form: React.FC<Props> = ({ onAdd }) => {
   const [count, setCount] = useState(0);
   const [touched, setTouched] = useState<Touched>({
     title: false,
@@ -33,7 +32,6 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
     setTouched({ title: true, user: true });
     if (!isError) {
       onAdd({
-        id: lastId + 1,
         title: form.title,
         completed: false,
         userId: form.user?.id,
@@ -59,20 +57,22 @@ export const Form: React.FC<Props> = ({ onAdd, lastId }) => {
         });
         setTouched(prev => ({
           ...prev,
-          title: false,
+          title: !value.trim(),
         }));
 
         break;
       case 'user':
+        const user = getUserById(+value);
+
         setForm(prev => {
           return {
             ...prev,
-            [name]: getUserById(+value),
+            [name]: user,
           };
         });
         setTouched(prev => ({
           ...prev,
-          user: false,
+          user: !user,
         }));
 
         break;

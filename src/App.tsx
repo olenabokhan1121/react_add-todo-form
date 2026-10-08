@@ -15,16 +15,20 @@ const todos = todosFromServer.map((todo: TodoFromServer) => ({
 
 export const App = () => {
   const [todoArr, setTodoArr] = useState<Todo[]>(todos);
-  const maxTodoId: number = Math.max(...todoArr.map(todo => todo.id));
 
-  function handleAdd(todo: Todo) {
-    setTodoArr(prevTodoList => [...prevTodoList, todo]);
+  function handleAdd(todo: Omit<Todo, 'id'>) {
+    const maxTodoId: number = Math.max(...todoArr.map(todoItem => todoItem.id));
+
+    setTodoArr(prevTodoList => [
+      ...prevTodoList,
+      { id: maxTodoId + 1, ...todo },
+    ]);
   }
 
   return (
     <div className="App">
       <h1>Add todo form</h1>
-      <Form onAdd={handleAdd} lastId={maxTodoId} />
+      <Form onAdd={handleAdd} />
       <TodoList todos={todoArr} />
     </div>
   );
